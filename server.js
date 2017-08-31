@@ -4,14 +4,18 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = 3000;
 var	state = {
-		ballX: 250,
-		ballY: 250,
-		ballRadius: 10,
-		canvasHeight: 500,
-		canvasWidth: 500,
+	ball: {
+		x: 250,
+		y: 250,
+		radius: 10,
 		dx: 2,
 		dy: -2
-	};
+	},
+	canvas: {
+		height: 500,
+		width: 500
+	}
+};
 
 // Middleware
 app.use(express.static('public'));
@@ -25,13 +29,11 @@ app.get('/', function(res, res) {
 io.on('connection', function(socket) {
 	io.clients(function(error, clients) {
 		if (error) throw error;
-		console.log(clients.length);
 		if (clients.length === 1) {
 			setInterval(function(){
 				moveBall();
 				ballCollisionDetection();
 				io.emit('refresh', state);
-				console.log(state);
 			}, 10);	
 		}
 	});
@@ -49,12 +51,15 @@ http.listen(port, function(){
 
 function ballCollisionDetection() {
 	// ceiling and floor
-	if (state.ballY - state.ballRadius < 0 || state.ballY + state.ballRadius > state.canvasHeight) {
-		state.dy = -state.dy;
+	var ball = state.ball;
+	var canvas = state.canvas;
+	if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
+		ball.dy = -ball.dy;
 	}
 }
 
 function moveBall() {
 	// state.ballX += state.dx;
-	state.ballY += state.dy;
+	var ball = state.ball;
+	ball.y += ball.dy;
 }

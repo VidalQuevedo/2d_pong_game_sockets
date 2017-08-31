@@ -22,15 +22,17 @@
 	}
 
 	function drawBall() {
+		var ball = state.ball;
 		ctx.beginPath();
-		ctx.arc(state.ballX, state.ballY, 10, 0, Math.PI * 2);
+		ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2);
 		ctx.fillStyle = '#000000';
 		ctx.fill();
 		ctx.closePath();
 	}
 
 	function clearCanvas() {
-		ctx.clearRect(0, 0, state.canvasWidth, state.canvasHeight);	
+		var canvas = state.canvas;
+		ctx.clearRect(0, 0, canvas.width, canvas.height);	
 	}
 
 	function init() {
