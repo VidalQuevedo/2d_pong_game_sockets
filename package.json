@@ -19,6 +19,6 @@
   "homepage": "https://github.com/VidalQuevedo/2d_pong_game_sockets#readme",
   "dependencies": {
     "express": "^4.15.4",
-    "socketio": "^1.0.0"
+    "socket.io": "2.0.3"
   }
 }
