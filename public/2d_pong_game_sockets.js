@@ -4,8 +4,8 @@
 
 	var socket = io();
 	var canvas = document.getElementById('2d-pong-game-sockets');
-	canvas.width = 500;
-	canvas.height = 500;
+	canvas.width = 400;
+	canvas.height = 300;
 
 	var state = {};
 	var ctx = canvas.getContext('2d');
@@ -37,6 +37,11 @@
 
 	function init() {
 		setSocketEventHandlers();
+		setCanvas();		
+	}
+
+	function setCanvas() {
+		
 	}
 
 	function setSocketEventHandlers() {
