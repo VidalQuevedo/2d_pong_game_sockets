@@ -1,0 +1,24 @@
+{
+  "name": "2d_pong_game_sockets",
+  "version": "0.0.1",
+  "description": "A 2D Pong Game with WebSockets",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VidalQuevedo/2d_pong_game_sockets.git"
+  },
+  "author": "Vidal Quevedo",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VidalQuevedo/2d_pong_game_sockets/issues"
+  },
+  "homepage": "https://github.com/VidalQuevedo/2d_pong_game_sockets#readme",
+  "dependencies": {
+    "express": "^4.15.4",
+    "socketio": "^1.0.0"
+  }
+}
