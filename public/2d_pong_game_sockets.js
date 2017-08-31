@@ -3,7 +3,7 @@
 	'use strict';
 
 	var socket = io();
-	var canvas = document.getElementById('2d-pong-game-sockets');
+	var canvas = document.getElementById('2d-pong-game-sockets-canvas');
 	canvas.width = 400;
 	canvas.height = 300;
 
@@ -14,8 +14,7 @@
 
 	////////////////////
 
-
-
+	
 	function draw() {
 		clearCanvas();
 		drawBall();
@@ -38,10 +37,6 @@
 	function init() {
 		setSocketEventHandlers();
 		setCanvas();		
-	}
-
-	function setCanvas() {
-		
 	}
 
 	function setSocketEventHandlers() {
