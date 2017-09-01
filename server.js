@@ -3,19 +3,7 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = 3000;
-var	state = {
-	ball: {
-		x: 150,
-		y: 200,
-		radius: 10,
-		dx: 2,
-		dy: -2
-	},
-	canvas: {
-		height: 300,
-		width: 400
-	}
-};
+var	state;
 
 // Middleware
 app.use(express.static('public'));
@@ -56,7 +44,8 @@ function init() {
 	io.on('connection', function(socket) {
 		io.clients(function(error, clients) {
 			if (error) throw error;
-			if (clients.length === 1) {
+			if (clients.length === 1 && !state) {
+				setState();
 				setInterval(refresh, 10);	
 			}
 		});
@@ -73,4 +62,20 @@ function refresh() {
 	moveBall();
 	ballCollisionDetection();
 	io.emit('refresh', state);	
+}
+
+function setState() {
+	state = {
+		ball: {
+			x: 150,
+			y: 200,
+			radius: 10,
+			dx: 2,
+			dy: -2
+		},
+		canvas: {
+			height: 300,
+			width: 400
+		}
+	};
 }
