@@ -41,6 +41,8 @@ function ballCollisionDetection() {
 }
 
 function init() {
+	
+	// On connection
 	io.on('connection', function(socket) {
 		io.clients(function(error, clients) {
 			if (error) throw error;
@@ -50,6 +52,8 @@ function init() {
 			}
 		});
 	});
+
+	// On 
 }
 
 function moveBall() {
@@ -65,6 +69,17 @@ function refresh() {
 }
 
 function setState() {
+	
+	var canvas = {
+		height: 300,
+		width: 400		
+	};
+	
+	var paddle = {
+		width: 10,
+		height: 70,
+	}
+
 	state = {
 		ball: {
 			x: 150,
@@ -73,9 +88,12 @@ function setState() {
 			dx: 2,
 			dy: -2
 		},
-		canvas: {
-			height: 300,
-			width: 400
+		canvas: canvas,
+		paddleRight: { // consider creating constructor function and instantiate it
+			x: canvas.width - paddle.width,
+			y: (canvas.height - paddle.height) / 2,
+			height: paddle.height,
+			width: paddle.width
 		}
 	};
 }
