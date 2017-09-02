@@ -14,7 +14,11 @@
 
 	////////////////////
 
-	
+	function addEventListeners() {
+		document.addEventListener('keydown', handleKeyDown, false);
+		document.addEventListener('keyup', handleKeyUp, false);
+	}
+
 	function draw() {
 		clearCanvas();
 		drawBall();
@@ -44,7 +48,20 @@
 		ctx.clearRect(0, 0, canvas.width, canvas.height);	
 	}
 
+	function handleKeyDown(event) {
+		const keyCode = event.keyCode;
+		if ([38, 39].indexOf(keyCode) === -1) return;
+		socket.emit('keydown', keyCode);
+	}
+
+	function handleKeyUp() {
+		const keyCode = event.keyCode;
+		if ([38, 40].indexOf(keyCode) === -1) return;
+		socket.emit('keydown', keyCode);
+	}
+
 	function init() {
+		addEventListeners();
 		setSocketEventHandlers();
 	}
 

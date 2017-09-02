@@ -40,10 +40,15 @@ function ballCollisionDetection() {
 	}
 }
 
+function handleKeyDown(clientId, keyCode) {
+	console.log(clientId, keyCode);
+}
+
 function init() {
 	
 	// On connection
 	io.on('connection', function(socket) {
+		
 		io.clients(function(error, clients) {
 			if (error) throw error;
 			if (clients.length === 1 && !state) {
@@ -51,9 +56,18 @@ function init() {
 				setInterval(refresh, 10);	
 			}
 		});
+
+		// on keydown
+		socket.on('keydown', function(keyCode) {
+			var clientId = socket.client.id;			
+			handleKeyDown(clientId, keyCode);
+		});
+
+		
+
 	});
 
-	// On 
+	
 }
 
 function moveBall() {
@@ -78,6 +92,7 @@ function setState() {
 	var paddle = {
 		width: 10,
 		height: 70,
+		dy: 7
 	}
 
 	state = {
