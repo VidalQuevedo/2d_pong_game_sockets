@@ -58,8 +58,8 @@
 	}
 
 	function handleKeyPress(event) {
-		const keyCode = event.keyCode;
-		const eventType = event.type;
+		var keyCode = event.keyCode;
+		var eventType = event.type;
 		
 		if ([38, 40].indexOf(keyCode) === -1) return;
 		socket.emit('keypress', eventType, keyCode);

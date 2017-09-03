@@ -85,7 +85,11 @@ function init() {
 
 		// on keypress
 		socket.on('keypress', function(eventType, keyCode) {
-			var clientId = socket.client.id;		
+			var clientId = socket.client.id;	
+
+			// check if valid player
+			if (!getPlayer(clientId)) return;
+
 			if (eventType === 'keydown') {
 				handleKeyDown(clientId, keyCode);
 			} else if (eventType === 'keyup') {
