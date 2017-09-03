@@ -25,22 +25,6 @@ init();
 
 ////////////////////
 
-function setPlayer(socket) {
-	var player = {id: socket.client.id, score: 0, side: null};
-	var players = state.players;
-	if (players.length === 0) {
-		player.side = 'left';
-	} else if (players.length === 1) {
-		player.side = (players[0].side === 'left') ? 'right' : 'left';
-	} else if (players.length === 2) {
-		return;
-	}
-
-	if (players.length < 2) {
-		players.push(player);
-	}
-}
-
 function ballCollisionDetection() {
 	var ball = state.ball;
 	var canvas = state.canvas;
@@ -56,9 +40,22 @@ function ballCollisionDetection() {
 	}
 }
 
+function getPlayer(clientId) {
+	return state.players.find(function(player) {
+		return player.id === clientId;
+	});
+}
+
 function handleKeyDown(clientId, keyCode) {
-	console.log('keydown', clientId, keyCode);
-	const player = getPlayerByClientId(clientId);
+	var player = getPlayer(clientId);
+	var side = player.side;
+	var paddle = (side === 'right') ? state.paddleRight : state.paddleLeft;
+
+	if (keyCode === 38) {
+		paddle.y -= 7;
+	} else if (keyCode === 40) {
+		paddle.y += 7;
+	}
 
 }
 
@@ -81,7 +78,7 @@ function init() {
 				setInterval(refresh, 10);	
 			}
 
-			// assign client to player
+			// set player
 			setPlayer(socket);
 
 		});
@@ -98,7 +95,6 @@ function init() {
 
 		socket.on('disconnect', function() { 
 			removePlayer(socket);
-			console.log(state.players);
 		});
 	});
 
@@ -125,6 +121,22 @@ function removePlayer(socket) {
 		return player.id === clientId;
 	});
 	state.players.splice(index, 1);
+}
+
+function setPlayer(socket) {
+	var player = {id: socket.client.id, score: 0, side: null};
+	var players = state.players;
+	if (players.length === 0) {
+		player.side = 'left';
+	} else if (players.length === 1) {
+		player.side = (players[0].side === 'left') ? 'right' : 'left';
+	} else if (players.length === 2) {
+		return;
+	}
+
+	if (players.length < 2) {
+		players.push(player);
+	}
 }
 
 function setState() {
@@ -156,7 +168,7 @@ function setState() {
 			width: paddle.width
 		},
 		paddleLeft: {
-			x: canvas.width - paddle.width,
+			x: 0,
 			y: (canvas.height - paddle.height) / 2,
 			height: paddle.height,
 			width: paddle.width			

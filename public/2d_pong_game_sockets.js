@@ -42,7 +42,14 @@
 		ctx.fillStyle = '#000000';
 		ctx.fill();
 		ctx.closePath();
-		
+
+		var paddleLeft = state.paddleLeft;
+		ctx.beginPath();
+		ctx.rect(paddleLeft.x, paddleLeft.y, paddleLeft.width, paddleLeft.height);
+		ctx.fillStyle = '#000000';
+		ctx.fill();
+		ctx.closePath();
+
 	}
 
 	function clearCanvas() {
@@ -55,7 +62,6 @@
 		const eventType = event.type;
 		
 		if ([38, 40].indexOf(keyCode) === -1) return;
-		console.log(keyCode, eventType);
 		socket.emit('keypress', eventType, keyCode);
 	}
 
