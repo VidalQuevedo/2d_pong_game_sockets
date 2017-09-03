@@ -25,6 +25,22 @@ init();
 
 ////////////////////
 
+function setPlayer(socket) {
+	var player = {id: socket.client.id, score: 0, side: null};
+	var players = state.players;
+	if (players.length === 0) {
+		player.side = 'left';
+	} else if (players.length === 1) {
+		player.side = (players[0].side === 'left') ? 'right' : 'left';
+	} else if (players.length === 2) {
+		return;
+	}
+
+	if (players.length < 2) {
+		players.push(player);
+	}
+}
+
 function ballCollisionDetection() {
 	var ball = state.ball;
 	var canvas = state.canvas;
@@ -41,7 +57,13 @@ function ballCollisionDetection() {
 }
 
 function handleKeyDown(clientId, keyCode) {
-	console.log(clientId, keyCode);
+	console.log('keydown', clientId, keyCode);
+	const player = getPlayerByClientId(clientId);
+
+}
+
+function handleKeyUp(clientId, keyCode) {
+	console.log('keyup', clientId, keyCode);
 }
 
 function init() {
@@ -50,22 +72,37 @@ function init() {
 	io.on('connection', function(socket) {
 		
 		io.clients(function(error, clients) {
+			
 			if (error) throw error;
+			
+			// init state object if first one to connect
 			if (clients.length === 1 && !state) {
 				setState();
 				setInterval(refresh, 10);	
 			}
+
+			// assign client to player
+			setPlayer(socket);
+
 		});
 
-		// on keydown
-		socket.on('keydown', function(keyCode) {
-			var clientId = socket.client.id;			
-			handleKeyDown(clientId, keyCode);
+		// on keypress
+		socket.on('keypress', function(eventType, keyCode) {
+			var clientId = socket.client.id;		
+			if (eventType === 'keydown') {
+				handleKeyDown(clientId, keyCode);
+			} else if (eventType === 'keyup') {
+				handleKeyUp(clientId, keyCode);
+			}
 		});
 
-		
-
+		socket.on('disconnect', function() { 
+			removePlayer(socket);
+			console.log(state.players);
+		});
 	});
+
+
 
 	
 }
@@ -80,6 +117,14 @@ function refresh() {
 	moveBall();
 	ballCollisionDetection();
 	io.emit('refresh', state);	
+}
+
+function removePlayer(socket) {
+	var clientId = socket.client.id;
+	var index = state.players.findIndex(function(player) {
+		return player.id === clientId;
+	});
+	state.players.splice(index, 1);
 }
 
 function setState() {
@@ -109,6 +154,13 @@ function setState() {
 			y: (canvas.height - paddle.height) / 2,
 			height: paddle.height,
 			width: paddle.width
-		}
+		},
+		paddleLeft: {
+			x: canvas.width - paddle.width,
+			y: (canvas.height - paddle.height) / 2,
+			height: paddle.height,
+			width: paddle.width			
+		},
+		players: []
 	};
 }

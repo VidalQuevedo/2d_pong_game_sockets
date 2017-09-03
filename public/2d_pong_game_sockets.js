@@ -15,8 +15,8 @@
 	////////////////////
 
 	function addEventListeners() {
-		document.addEventListener('keydown', handleKeyDown, false);
-		document.addEventListener('keyup', handleKeyUp, false);
+		document.addEventListener('keydown', handleKeyPress, false);
+		document.addEventListener('keyup', handleKeyPress, false);
 	}
 
 	function draw() {
@@ -35,12 +35,14 @@
 	}
 
 	function drawPaddles() {
+		
 		var paddleRight = state.paddleRight;
 		ctx.beginPath();
 		ctx.rect(paddleRight.x, paddleRight.y, paddleRight.width, paddleRight.height);
 		ctx.fillStyle = '#000000';
 		ctx.fill();
 		ctx.closePath();
+		
 	}
 
 	function clearCanvas() {
@@ -48,16 +50,13 @@
 		ctx.clearRect(0, 0, canvas.width, canvas.height);	
 	}
 
-	function handleKeyDown(event) {
+	function handleKeyPress(event) {
 		const keyCode = event.keyCode;
-		if ([38, 39].indexOf(keyCode) === -1) return;
-		socket.emit('keydown', keyCode);
-	}
-
-	function handleKeyUp() {
-		const keyCode = event.keyCode;
+		const eventType = event.type;
+		
 		if ([38, 40].indexOf(keyCode) === -1) return;
-		socket.emit('keydown', keyCode);
+		console.log(keyCode, eventType);
+		socket.emit('keypress', eventType, keyCode);
 	}
 
 	function init() {
