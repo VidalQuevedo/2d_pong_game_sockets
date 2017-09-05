@@ -52,15 +52,22 @@ function handleKeyDown(clientId, keyCode) {
 	var paddle = (side === 'right') ? state.paddleRight : state.paddleLeft;
 
 	if (keyCode === 38) {
-		paddle.y -= 7;
+		paddle.upPressed = true;
 	} else if (keyCode === 40) {
-		paddle.y += 7;
+		paddle.downPressed = true;
 	}
-
 }
 
 function handleKeyUp(clientId, keyCode) {
-	console.log('keyup', clientId, keyCode);
+	var player = getPlayer(clientId);
+	var side = player.side;
+	var paddle = (side === 'right') ? state.paddleRight : state.paddleLeft;
+
+	if (keyCode === 38) {
+		paddle.upPressed = false;
+	} else if (keyCode === 40) {
+		paddle.downPressed = false;
+	}
 }
 
 function init() {
@@ -113,9 +120,30 @@ function moveBall() {
 	ball.y += ball.dy;
 }
 
+function movePaddles() {
+	var paddleLeft = state.paddleLeft;
+	var paddleRight = state.paddleRight;
+
+	// left paddle
+	if (paddleLeft.upPressed) {
+		paddleLeft.y -= 7;
+	} else if(paddleLeft.downPressed) {
+		paddleLeft.y += 7;
+	}
+	
+	// right paddle
+	if (paddleRight.upPressed) {
+		paddleRight.y -= 7;
+	} else if(paddleRight.downPressed) {
+		paddleRight.y += 7;
+	}
+
+}
+
 function refresh() {
 	moveBall();
 	ballCollisionDetection();
+	movePaddles();
 	io.emit('refresh', state);	
 }
 
@@ -169,14 +197,18 @@ function setState() {
 			x: canvas.width - paddle.width,
 			y: (canvas.height - paddle.height) / 2,
 			height: paddle.height,
-			width: paddle.width
+			width: paddle.width,
+			upPressed: false,
+			downPressed: false
 		},
 		paddleLeft: {
 			x: 0,
 			y: (canvas.height - paddle.height) / 2,
 			height: paddle.height,
-			width: paddle.width			
-		},
+			width: paddle.width,
+			upPressed: false,
+			downPressed: false			
+		},	
 		players: []
 	};
 }
