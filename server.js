@@ -28,6 +28,8 @@ init();
 function ballCollisionDetection() {
 	var ball = state.ball;
 	var canvas = state.canvas;
+	var paddleRight = state.paddleRight;
+	var paddleLeft = state.paddleLeft;
 
 	// ceiling and floor
 	if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
@@ -35,7 +37,20 @@ function ballCollisionDetection() {
 	}
 
 	// left / right walls
-	if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+	// if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
+	// 	// ball.dx = -ball.dx;
+	// }	
+	// if (ball.x - ball.radius < 0) {
+	// 	ball.dx = -ball.dx;
+	// }
+
+	// paddleRight
+	if (ball.x + ball.radius > paddleRight.x && ball.y > paddleRight.y && ball.y < paddleRight.y + paddleRight.height) {
+		ball.dx = -ball.dx;
+	}	
+
+	// paddleLeft
+	if (ball.x - ball.radius < paddleLeft.x + paddleLeft.width && ball.y > paddleLeft.y && ball.y < paddleLeft.y + paddleLeft.height) {
 		ball.dx = -ball.dx;
 	}
 }
