@@ -109,9 +109,6 @@ function init() {
 		});
 	});
 
-
-
-	
 }
 
 function moveBall() {
@@ -123,18 +120,19 @@ function moveBall() {
 function movePaddles() {
 	var paddleLeft = state.paddleLeft;
 	var paddleRight = state.paddleRight;
+	var canvas = state.canvas;
 
 	// left paddle
-	if (paddleLeft.upPressed) {
+	if (paddleLeft.upPressed && paddleLeft.y > 0) {
 		paddleLeft.y -= 7;
-	} else if(paddleLeft.downPressed) {
+	} else if(paddleLeft.downPressed && paddleLeft.y + paddleLeft.height < canvas.height) {
 		paddleLeft.y += 7;
 	}
 	
 	// right paddle
-	if (paddleRight.upPressed) {
+	if (paddleRight.upPressed && paddleRight.y > 0) {
 		paddleRight.y -= 7;
-	} else if(paddleRight.downPressed) {
+	} else if(paddleRight.downPressed && paddleRight.y + paddleRight.height < canvas.height) {
 		paddleRight.y += 7;
 	}
 
