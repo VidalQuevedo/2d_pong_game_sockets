@@ -75,6 +75,13 @@
 			state = data;
 			draw();
 		});
+		socket.on('gameOver', function(data) {
+			state = data;
+			if (state.winner) {
+				alert(state.winner.side.charAt(0).toUpperCase() + ' player wins!');
+				document.location.reload();
+			}
+		});
 	}
 	
 })();

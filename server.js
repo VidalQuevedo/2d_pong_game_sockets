@@ -3,7 +3,9 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = 3000;
+var refreshInterval;
 var	state;
+
 
 // Middleware
 app.use(express.static('public'));
@@ -28,37 +30,49 @@ init();
 function ballCollisionDetection() {
 	var ball = state.ball;
 	var canvas = state.canvas;
-	var paddleRight = state.paddleRight;
 	var paddleLeft = state.paddleLeft;
+	var paddleRight = state.paddleRight;
+	var playerLeft = state.playerLeft;
+	var playerRight = state.playerRight;
 
 	// ceiling and floor
 	if (ball.y - ball.radius < 0 || ball.y + ball.radius > canvas.height) {
 		ball.dy = -ball.dy;
 	}
 
-	// left / right walls
-	// if (ball.x - ball.radius < 0 || ball.x + ball.radius > canvas.width) {
-	// 	// ball.dx = -ball.dx;
-	// }	
-	// if (ball.x - ball.radius < 0) {
-	// 	ball.dx = -ball.dx;
-	// }
+	// paddleLeft
+	if (ball.x - ball.radius < paddleLeft.x + paddleLeft.width) {
+		if (ball.y > paddleLeft.y && ball.y < paddleLeft.y + paddleLeft.height) {
+			ball.dx = -ball.dx;
+		} else {
+			playerRight.score++;
+			checkGameStatus();
+		}
+	}
 
 	// paddleRight
-	if (ball.x + ball.radius > paddleRight.x && ball.y > paddleRight.y && ball.y < paddleRight.y + paddleRight.height) {
-		ball.dx = -ball.dx;
-	}	
-
-	// paddleLeft
-	if (ball.x - ball.radius < paddleLeft.x + paddleLeft.width && ball.y > paddleLeft.y && ball.y < paddleLeft.y + paddleLeft.height) {
-		ball.dx = -ball.dx;
+	if (ball.x + ball.radius > paddleRight.x) {
+		if (ball.y > paddleRight.y && ball.y < paddleRight.y + paddleRight.height) {
+			ball.dx = -ball.dx;
+		} else {
+			playerLeft.score++;
+			checkGameStatus();
+		}
 	}
+
 }
 
-function getPlayer(clientId) {
-	return state.players.find(function(player) {
-		return player.id === clientId;
-	});
+function checkGameStatus() {
+	var playerLeft = state.playerLeft;
+	var playerRight = state.playerRight;
+
+	if (playerLeft.score === 3) {
+		state.winner = playerLeft;
+	}
+	if (playerRight.score === 3) {
+		state.winner = playerRight;
+	}
+	startNewRound();		
 }
 
 function handleKeyDown(clientId, keyCode) {
@@ -97,7 +111,7 @@ function init() {
 			// init state object if first one to connect
 			if (clients.length === 1 && !state) {
 				setState();
-				setInterval(refresh, 10);	
+				refreshInterval = setInterval(refresh, 10);	
 			}
 
 			// set player
@@ -112,18 +126,36 @@ function init() {
 			// check if valid player
 			if (!getPlayer(clientId)) return;
 
+			// choose handler
 			if (eventType === 'keydown') {
 				handleKeyDown(clientId, keyCode);
 			} else if (eventType === 'keyup') {
 				handleKeyUp(clientId, keyCode);
 			}
+
 		});
 
+		// on socket disconnect
 		socket.on('disconnect', function() { 
-			removePlayer(socket);
+			var clientId = socket.client.id;
+			
+			// check if valid player
+			if (!getPlayer(clientId)) return;
+			
+			// remove player
+			removePlayer(clientId);
+
 		});
 	});
 
+}
+
+function getPlayer(clientId) {
+	var players = [state.playerLeft, state.playerRight];
+	var player = players.find(function(player) {
+		return player.id === clientId;
+	});
+	return player;
 }
 
 function moveBall() {
@@ -154,33 +186,33 @@ function movePaddles() {
 }
 
 function refresh() {
-	moveBall();
-	ballCollisionDetection();
-	movePaddles();
-	io.emit('refresh', state);	
+	if (state.winner) {
+		io.emit('gameOver', state.winner);
+		setState();
+	} else {
+		moveBall();
+		ballCollisionDetection();
+		movePaddles();
+		io.emit('refresh', state);			
+	}
 }
 
-function removePlayer(socket) {
-	var clientId = socket.client.id;
-	var index = state.players.findIndex(function(player) {
-		return player.id === clientId;
-	});
-	state.players.splice(index, 1);
+function removePlayer(clientId) {
+	var player = getPlayer(clientId);
+	player.id = null;
+	player.score = 0;
 }
 
 function setPlayer(socket) {
-	var player = {id: socket.client.id, score: 0, side: null};
-	var players = state.players;
-	if (players.length === 0) {
-		player.side = 'left';
-	} else if (players.length === 1) {
-		player.side = (players[0].side === 'left') ? 'right' : 'left';
-	} else if (players.length === 2) {
-		return;
-	}
+	var playerLeft = state.playerLeft;
+	var playerRight = state.playerRight;
 
-	if (players.length < 2) {
-		players.push(player);
+	if (playerLeft.id === null && playerRight.id === null) {
+		playerLeft.id = socket.client.id;
+	} else if (playerLeft.id === null && playerRight.id !== null) {
+		playerLeft.id = socket.client.id;
+	} else if (playerLeft.id !== null && playerRight.id === null) {
+		playerRight.id = socket.client.id;
 	}
 }
 
@@ -206,7 +238,7 @@ function setState() {
 			dy: -2
 		},
 		canvas: canvas,
-		paddleRight: { // consider creating constructor function and instantiate it
+		paddleRight: {
 			x: canvas.width - paddle.width,
 			y: (canvas.height - paddle.height) / 2,
 			height: paddle.height,
@@ -221,7 +253,39 @@ function setState() {
 			width: paddle.width,
 			upPressed: false,
 			downPressed: false			
-		},	
-		players: []
+		},
+		playerLeft: {
+			id: null, 
+			score: 0, 
+			side: 'left'
+		},
+		playerRight: {
+			id: null, 
+			score: 0, 
+			side: 'right'
+		},
+		round: 0,
+		winner: null
 	};
 }
+
+
+function startNewRound() {
+	var ball = state.ball;
+	var canvas = state.canvas;
+	var round = state.round;
+	
+	round++;
+	ball.x = canvas.width / 2;
+	ball.y = canvas.height / 2;
+	ball.dx = -ball.dx;
+	ball.dy = -ball.dy;
+
+	console.log(state);
+
+		// increase speed
+		// if (roundCount % 3 === 0) {
+		// 	dx = (dx < 0) ? dx - 0.5 : dx + 0.5;
+		// 	dy = (dy < 0) ? dy - 0.5 : dy + 0.5;
+		// }
+	}
