@@ -22,6 +22,7 @@
 	function draw() {
 		clearCanvas();
 		drawBall();
+		drawNetLine();
 		drawPaddles();
 	}
 
@@ -31,6 +32,17 @@
 		ctx.arc(ball.x, ball.y, 10, 0, Math.PI * 2);
 		ctx.fillStyle = '#000000';
 		ctx.fill();
+		ctx.closePath();
+	}
+
+	function drawNetLine() {
+		var canvas = state.canvas;
+		ctx.beginPath();
+		ctx.setLineDash([10, 10]);
+		ctx.moveTo(canvas.width / 2, 0);
+		ctx.lineTo(canvas.width / 2, canvas.height);
+		ctx.strokeStyle = '#000000';
+		ctx.stroke();
 		ctx.closePath();
 	}
 
