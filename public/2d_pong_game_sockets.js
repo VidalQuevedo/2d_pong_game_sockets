@@ -19,11 +19,17 @@
 		document.addEventListener('keyup', handleKeyPress, false);
 	}
 
+	function clearCanvas() {
+		var canvas = state.canvas;
+		ctx.clearRect(0, 0, canvas.width, canvas.height);	
+	}	
+
 	function draw() {
 		clearCanvas();
 		drawBall();
 		drawNetLine();
 		drawPaddles();
+		drawScores();
 	}
 
 	function drawBall() {
@@ -48,25 +54,43 @@
 
 	function drawPaddles() {
 		
-		var paddleRight = state.paddleRight;
-		ctx.beginPath();
-		ctx.rect(paddleRight.x, paddleRight.y, paddleRight.width, paddleRight.height);
-		ctx.fillStyle = '#000000';
-		ctx.fill();
-		ctx.closePath();
-
 		var paddleLeft = state.paddleLeft;
+		var paddleRight = state.paddleRight;
+
+		// Paddle Right
 		ctx.beginPath();
 		ctx.rect(paddleLeft.x, paddleLeft.y, paddleLeft.width, paddleLeft.height);
 		ctx.fillStyle = '#000000';
 		ctx.fill();
 		ctx.closePath();
 
+		// Paddle Left
+		ctx.beginPath();
+		ctx.rect(paddleRight.x, paddleRight.y, paddleRight.width, paddleRight.height);
+		ctx.fillStyle = '#000000';
+		ctx.fill();
+		ctx.closePath();
+
 	}
 
-	function clearCanvas() {
-		var canvas = state.canvas;
-		ctx.clearRect(0, 0, canvas.width, canvas.height);	
+	function drawScores() {
+		var playerLeft = state.playerLeft;
+		var playerRight = state.playerRight;
+
+		// Player Left
+		ctx.beginPath();
+		ctx.font = '64px \'Courier New\'';
+		ctx.fillStyle = '#000000';
+		ctx.fillText(playerLeft.score, canvas.width / 2 -74, 64);
+		ctx.closePath();
+
+		// Player Right
+		ctx.beginPath();
+		ctx.font = '64px \'Courier New\'';
+		ctx.fillStyle = '#000000';
+		ctx.fillText(playerRight.score, canvas.width / 2 + 34, 64);
+		ctx.closePath();		
+
 	}
 
 	function handleKeyPress(event) {
