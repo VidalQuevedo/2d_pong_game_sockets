@@ -4,8 +4,8 @@
 
 	var socket = io();
 	var canvas = document.getElementById('2d-pong-game-sockets-canvas');
-	canvas.width = 400;
-	canvas.height = 300;
+	canvas.width = 800;
+	canvas.height = 600;
 
 	var state = {};
 	var ctx = canvas.getContext('2d');
@@ -114,8 +114,8 @@
 		socket.on('gameOver', function(data) {
 			state = data;
 			if (state.winner) {
-				alert(state.winner.side.charAt(0).toUpperCase() + ' player wins!');
-				document.location.reload();
+				alert(' player wins!');
+				// document.location.reload();
 			}
 		});
 	}

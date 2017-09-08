@@ -72,6 +72,7 @@ function checkGameStatus() {
 	if (playerRight.score === 3) {
 		state.winner = playerRight;
 	}
+	
 	startNewRound();		
 }
 
@@ -188,7 +189,8 @@ function movePaddles() {
 function refresh() {
 	if (state.winner) {
 		io.emit('gameOver', state.winner);
-		setState();
+		clearInterval(refreshInterval);
+		// setState();
 	} else {
 		moveBall();
 		ballCollisionDetection();
@@ -219,8 +221,8 @@ function setPlayer(socket) {
 function setState() {
 	
 	var canvas = {
-		height: 300,
-		width: 400		
+		height: 600,
+		width: 800		
 	};
 	
 	var paddle = {
